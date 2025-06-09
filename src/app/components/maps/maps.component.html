@@ -1,0 +1,128 @@
+<div class="maps-container">
+  <div class="maps-header">
+    <h1>Interactive Maps</h1>
+    <p>Explore Tunisia and pin your favorite places</p>
+  </div>
+
+  <div class="maps-layout">
+    <!-- Map Section -->
+    <div class="map-section">
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>location_on</mat-icon>
+            Tunisia Map
+          </mat-card-title>
+          <mat-card-subtitle>Click anywhere on the map to pin a location</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="map-container">
+            <app-map-component
+              [pinnedPlaces]="pinnedPlaces"
+              [selectedPlace]="selectedPlace"
+              (mapClick)="onMapClick($event.lat, $event.lng)"
+              (placeSelect)="onPlaceSelect($event)">
+            </app-map-component>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar-section">
+      <!-- Add Place -->
+      <mat-card class="sidebar-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>add</mat-icon>
+            Add Place
+          </mat-card-title>
+          <mat-card-subtitle>Enter a name for your next pinned location</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Place name (optional)</mat-label>
+            <input matInput [(ngModel)]="newPlaceName" placeholder="Enter place name">
+          </mat-form-field>
+          <p class="instruction-text">Click on the map to pin a location</p>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Pinned Places List -->
+      <mat-card class="sidebar-card">
+        <mat-card-header>
+          <div class="places-header">
+            <div>
+              <mat-card-title>
+                <mat-icon>location_on</mat-icon>
+                Pinned Places
+              </mat-card-title>
+              <mat-card-subtitle>
+                {{pinnedPlaces.length}} location{{pinnedPlaces.length !== 1 ? 's' : ''}} saved
+              </mat-card-subtitle>
+            </div>
+            <button 
+              mat-icon-button 
+              color="warn" 
+              *ngIf="pinnedPlaces.length > 0"
+              (click)="clearAllPlaces()"
+              matTooltip="Clear all places">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="places-list" *ngIf="pinnedPlaces.length > 0; else noPlaces">
+            <div 
+              class="place-item"
+              *ngFor="let place of pinnedPlaces"
+              [class.selected]="selectedPlace?.id === place.id"
+              (click)="selectPlace(place)">
+              <div class="place-info">
+                <h4 class="place-name">{{place.name}}</h4>
+                <p class="place-coords">
+                  {{place.lat | number:'1.4-4'}}, {{place.lng | number:'1.4-4'}}
+                </p>
+              </div>
+              <button 
+                mat-icon-button 
+                color="warn" 
+                (click)="removePinnedPlace(place.id); $event.stopPropagation()"
+                matTooltip="Remove place">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </div>
+          
+          <ng-template #noPlaces>
+            <div class="no-places">
+              <mat-icon>location_off</mat-icon>
+              <p>No places pinned yet. Click on the map to add one!</p>
+            </div>
+          </ng-template>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Selected Place Info -->
+      <mat-card class="sidebar-card" *ngIf="selectedPlace">
+        <mat-card-header>
+          <mat-card-title>Selected Place</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="selected-place-info">
+            <h4>{{selectedPlace.name}}</h4>
+            <mat-chip>{{selectedPlace.lat | number:'1.4-4'}}, {{selectedPlace.lng | number:'1.4-4'}}</mat-chip>
+            <button 
+              mat-raised-button 
+              color="warn" 
+              class="remove-button"
+              (click)="removePinnedPlace(selectedPlace.id)">
+              <mat-icon>delete</mat-icon>
+              Remove Place
+            </button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,28 @@
+<mat-toolbar color="primary" class="navigation-toolbar">
+  <div class="nav-container">
+    <div class="nav-brand" routerLink="/">
+      <div class="brand-icon">TN</div>
+      <span class="brand-text">Tunisia Hub</span>
+    </div>
+    
+    <div class="nav-links">
+      <button 
+        mat-button 
+        routerLink="/weather" 
+        [class.active]="isActive('/weather')"
+        class="nav-link">
+        <mat-icon>cloud</mat-icon>
+        Weather
+      </button>
+      
+      <button 
+        mat-button 
+        routerLink="/maps" 
+        [class.active]="isActive('/maps')"
+        class="nav-link">
+        <mat-icon>map</mat-icon>
+        Maps
+      </button>
+    </div>
+  </div>
+</mat-toolbar>

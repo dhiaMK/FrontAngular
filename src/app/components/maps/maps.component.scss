@@ -1,0 +1,178 @@
+.maps-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.maps-header {
+  text-align: center;
+  margin-bottom: 32px;
+  
+  h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 8px;
+  }
+  
+  p {
+    color: #666;
+    font-size: 1.1rem;
+  }
+}
+
+.maps-layout {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: 24px;
+  
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.map-section {
+  .map-container {
+    height: 500px;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  mat-card-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+}
+
+.sidebar-section {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  
+  .sidebar-card {
+    mat-card-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1.1rem;
+    }
+  }
+  
+  .full-width {
+    width: 100%;
+  }
+  
+  .instruction-text {
+    font-size: 0.9rem;
+    color: #666;
+    margin: 12px 0 0 0;
+  }
+  
+  .places-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 100%;
+  }
+  
+  .places-list {
+    max-height: 300px;
+    overflow-y: auto;
+    
+    .place-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      
+      &:hover {
+        border-color: #ccc;
+        background-color: #f8f9fa;
+      }
+      
+      &.selected {
+        border-color: #1976d2;
+        background-color: #e3f2fd;
+      }
+      
+      &:last-child {
+        margin-bottom: 0;
+      }
+      
+      .place-info {
+        flex: 1;
+        
+        .place-name {
+          margin: 0 0 4px 0;
+          font-size: 0.95rem;
+          font-weight: 600;
+        }
+        
+        .place-coords {
+          margin: 0;
+          font-size: 0.8rem;
+          color: #666;
+        }
+      }
+    }
+  }
+  
+  .no-places {
+    text-align: center;
+    padding: 32px 16px;
+    color: #666;
+    
+    mat-icon {
+      font-size: 3rem;
+      width: 3rem;
+      height: 3rem;
+      color: #ccc;
+      margin-bottom: 16px;
+    }
+    
+    p {
+      margin: 0;
+    }
+  }
+  
+  .selected-place-info {
+    text-align: center;
+    
+    h4 {
+      margin: 0 0 12px 0;
+      font-weight: 600;
+    }
+    
+    mat-chip {
+      margin-bottom: 16px;
+    }
+    
+    .remove-button {
+      width: 100%;
+      
+      mat-icon {
+        margin-right: 8px;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .maps-container {
+    padding: 16px;
+  }
+  
+  .maps-layout {
+    gap: 16px;
+  }
+  
+  .sidebar-section {
+    gap: 16px;
+  }
+}

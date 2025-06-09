@@ -1,0 +1,68 @@
+<div class="home-container">
+  <div class="hero-section">
+    <h1>Welcome to Tunisia Hub</h1>
+    <p class="hero-description">
+      Explore weather conditions across Tunisian cities and discover places on interactive maps
+    </p>
+  </div>
+
+  <div class="features-grid">
+    <mat-card class="feature-card" routerLink="/weather">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon color="primary">cloud</mat-icon>
+          Weather Information
+        </mat-card-title>
+        <mat-card-subtitle>
+          Get real-time weather data for major cities across Tunisia
+        </mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="feature-list">
+          <div class="feature-item">
+            <mat-icon>thermostat</mat-icon>
+            <span>Temperature, humidity, and conditions</span>
+          </div>
+          <div class="feature-item">
+            <mat-icon>location_on</mat-icon>
+            <span>Multiple Tunisian cities available</span>
+          </div>
+        </div>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-raised-button color="primary" routerLink="/weather">
+          View Weather
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+    <mat-card class="feature-card" routerLink="/maps">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon color="accent">map</mat-icon>
+          Interactive Maps
+        </mat-card-title>
+        <mat-card-subtitle>
+          Explore Tunisia with interactive maps and pin your favorite places
+        </mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="feature-list">
+          <div class="feature-item">
+            <mat-icon>location_on</mat-icon>
+            <span>Click to pin locations</span>
+          </div>
+          <div class="feature-item">
+            <mat-icon>map</mat-icon>
+            <span>Interactive Leaflet maps</span>
+          </div>
+        </div>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-raised-button color="accent" routerLink="/maps">
+          Explore Maps
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+</div>

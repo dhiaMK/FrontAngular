@@ -1,0 +1,343 @@
+<div class="weather-container">
+  <div class="weather-header">
+    <h1>Tunisia Weather</h1>
+    <p>Weather information, marine conditions, and safety recommendations</p>
+  </div>
+
+  <!-- Marine Conditions -->
+  <div class="marine-conditions" *ngIf="marineConditions">
+    <div class="conditions-grid">
+      <mat-card class="condition-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>waves</mat-icon>
+            Swimming Conditions
+          </mat-card-title>
+          <mat-card-subtitle>Safety assessment for beach swimming in {{selectedCity.name}}</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="status-display" [ngClass]="'status-' + marineConditions.swimming.status">
+            <div class="status-header">
+              <mat-icon [color]="getStatusColor(marineConditions.swimming.status)">
+                {{marineConditions.swimming.status === 'excellent' || marineConditions.swimming.status === 'good' ? 'check_circle' : 'warning'}}
+              </mat-icon>
+              <span class="status-text">{{marineConditions.swimming.status | titlecase}}</span>
+              <mat-chip>Score: {{marineConditions.swimming.score}}/100</mat-chip>
+            </div>
+            <p class="recommendation">{{marineConditions.swimming.recommendation}}</p>
+            <div class="reasons" *ngIf="marineConditions.swimming.reasons.length > 0">
+              <h4>Factors affecting conditions:</h4>
+              <ul>
+                <li *ngFor="let reason of marineConditions.swimming.reasons">{{reason}}</li>
+              </ul>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="condition-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>sailing</mat-icon>
+            Sailing & Fishing Conditions
+          </mat-card-title>
+          <mat-card-subtitle>Safety assessment for sailing and sea fishing near {{selectedCity.name}}</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="status-display" [ngClass]="'status-' + marineConditions.sailing.status">
+            <div class="status-header">
+              <mat-icon [color]="getStatusColor(marineConditions.sailing.status)">
+                {{marineConditions.sailing.status === 'excellent' || marineConditions.sailing.status === 'good' ? 'check_circle' : 'warning'}}
+              </mat-icon>
+              <span class="status-text">{{marineConditions.sailing.status | titlecase}}</span>
+              <mat-chip>Score: {{marineConditions.sailing.score}}/100</mat-chip>
+            </div>
+            <p class="recommendation">{{marineConditions.sailing.recommendation}}</p>
+            <div class="reasons" *ngIf="marineConditions.sailing.reasons.length > 0">
+              <h4>Factors affecting conditions:</h4>
+              <ul>
+                <li *ngFor="let reason of marineConditions.sailing.reasons">{{reason}}</li>
+              </ul>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- Weather Alerts -->
+  <mat-card class="alerts-card" *ngIf="alertsData?.alerts && alertsData.alerts.length > 0">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon color="warn">warning</mat-icon>
+        Active Weather Alerts
+      </mat-card-title>
+      <mat-card-subtitle>
+        {{alertsData.alerts.length}} active alert{{alertsData.alerts.length !== 1 ? 's' : ''}} for {{selectedCity.name}}
+      </mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="alert-item" *ngFor="let alert of alertsData.alerts">
+        <div class="alert-header">
+          <mat-icon color="warn">bolt</mat-icon>
+          <h4>{{alert.event}}</h4>
+          <mat-chip color="warn">{{alert.tags[1] || 'Alert'}}</mat-chip>
+        </div>
+        <p class="alert-description">{{alert.description}}</p>
+        <div class="alert-footer">
+          <span class="alert-time">Valid: {{alert.start * 1000 | date:'short'}} - {{alert.end * 1000 | date:'short'}}</span>
+          <span class="alert-source">Issued by: {{alert.sender_name}}</span>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- City Selection -->
+  <mat-card class="city-selection">
+    <mat-card-header>
+      <mat-card-title>Select a City</mat-card-title>
+      <mat-card-subtitle>Choose a Tunisian coastal city to view weather and marine conditions</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="city-buttons">
+        <button 
+          mat-raised-button 
+          *ngFor="let city of tunisianCities"
+          [color]="selectedCity.name === city.name ? 'primary' : ''"
+          [disabled]="loading"
+          (click)="selectCity(city)">
+          {{city.name}}
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Loading State -->
+  <mat-card *ngIf="loading" class="loading-card">
+    <mat-card-content>
+      <div class="loading-content">
+        <mat-spinner diameter="40"></mat-spinner>
+        <span>Fetching weather and marine conditions...</span>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Error State -->
+  <mat-card *ngIf="error" class="error-card">
+    <mat-card-content>
+      <div class="error-content">
+        <mat-icon color="warn">error</mat-icon>
+        <div>
+          <strong>Error:</strong> {{error}}
+          <br>
+          <button mat-raised-button color="primary" (click)="fetchWeather(selectedCity)">
+            Try Again
+          </button>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Weather Display -->
+  <mat-card *ngIf="weatherData && !loading" class="weather-display">
+    <mat-tab-group>
+      <mat-tab label="Current Weather">
+        <div class="tab-content">
+          <div class="current-weather-grid">
+            <!-- Main Weather Info -->
+            <mat-card class="weather-main">
+              <mat-card-header>
+                <mat-card-title>{{weatherData.name}}, {{weatherData.sys.country}}</mat-card-title>
+                <mat-card-subtitle>{{weatherData.weather[0].description | titlecase}}</mat-card-subtitle>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="temperature-display">
+                  <div class="main-temp">{{weatherData.main.temp | number:'1.0-0'}}°C</div>
+                  <div class="feels-like">Feels like {{weatherData.main.feels_like | number:'1.0-0'}}°C</div>
+                  <div class="temp-range">
+                    H: {{weatherData.main.temp_max | number:'1.0-0'}}° L: {{weatherData.main.temp_min | number:'1.0-0'}}°
+                  </div>
+                </div>
+                
+                <div class="weather-details">
+                  <div class="detail-item">
+                    <mat-icon>water_drop</mat-icon>
+                    <span>Humidity: {{weatherData.main.humidity}}%</span>
+                  </div>
+                  <div class="detail-item">
+                    <mat-icon>air</mat-icon>
+                    <span>Wind: {{weatherData.wind.speed}} m/s</span>
+                  </div>
+                  <div class="detail-item">
+                    <mat-icon>visibility</mat-icon>
+                    <span>Visibility: {{(weatherData.visibility / 1000) | number:'1.1-1'}} km</span>
+                  </div>
+                  <div class="detail-item">
+                    <mat-icon>compress</mat-icon>
+                    <span>Pressure: {{weatherData.main.pressure}} hPa</span>
+                  </div>
+                </div>
+              </mat-card-content>
+            </mat-card>
+
+            <!-- Weather Icon and Additional Info -->
+            <mat-card class="weather-additional">
+              <mat-card-header>
+                <mat-card-title>Weather Details</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="weather-icon-display">
+                  <img 
+                    [src]="'https://openweathermap.org/img/wn/' + weatherData.weather[0].icon + '@2x.png'"
+                    [alt]="weatherData.weather[0].description"
+                    class="weather-icon">
+                </div>
+                
+                <div class="additional-details">
+                  <div class="detail-row">
+                    <mat-icon>cloud</mat-icon>
+                    <span>Cloudiness</span>
+                    <span>{{weatherData.clouds.all}}%</span>
+                  </div>
+                  <div class="detail-row">
+                    <mat-icon>wb_sunny</mat-icon>
+                    <span>Sunrise</span>
+                    <span>{{formatTime(weatherData.sys.sunrise)}}</span>
+                  </div>
+                  <div class="detail-row">
+                    <mat-icon>brightness_3</mat-icon>
+                    <span>Sunset</span>
+                    <span>{{formatTime(weatherData.sys.sunset)}}</span>
+                  </div>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          </div>
+
+          <!-- Weather Summary Cards -->
+          <div class="summary-cards">
+            <mat-card class="summary-card">
+              <mat-card-content>
+                <mat-icon color="warn">thermostat</mat-icon>
+                <div class="summary-value">{{weatherData.main.temp | number:'1.0-0'}}°C</div>
+                <div class="summary-label">Temperature</div>
+              </mat-card-content>
+            </mat-card>
+            
+            <mat-card class="summary-card">
+              <mat-card-content>
+                <mat-icon color="primary">water_drop</mat-icon>
+                <div class="summary-value">{{weatherData.main.humidity}}%</div>
+                <div class="summary-label">Humidity</div>
+              </mat-card-content>
+            </mat-card>
+            
+            <mat-card class="summary-card">
+              <mat-card-content>
+                <mat-icon>air</mat-icon>
+                <div class="summary-value">{{weatherData.wind.speed}} m/s</div>
+                <div class="summary-label">Wind Speed</div>
+              </mat-card-content>
+            </mat-card>
+            
+            <mat-card class="summary-card">
+              <mat-card-content>
+                <mat-icon>cloud</mat-icon>
+                <div class="summary-value">{{weatherData.clouds.all}}%</div>
+                <div class="summary-label">Cloudiness</div>
+              </mat-card-content>
+            </mat-card>
+          </div>
+        </div>
+      </mat-tab>
+
+      <mat-tab label="5-Day Forecast">
+        <div class="tab-content">
+          <div class="forecast-overview" *ngIf="dailyForecasts.length > 0">
+            <div class="forecast-cards">
+              <mat-card class="forecast-card" *ngFor="let day of dailyForecasts">
+                <mat-card-content>
+                  <div class="forecast-day">{{formatDayName(day.date)}}</div>
+                  <div class="forecast-date">{{formatDate(day.date)}}</div>
+                  <mat-icon class="forecast-icon">{{getWeatherIcon(day.weather.icon)}}</mat-icon>
+                  <div class="forecast-description">{{day.weather.description | titlecase}}</div>
+                  <div class="forecast-temps">
+                    <div class="temp-high">{{day.temp_max | number:'1.0-0'}}°</div>
+                    <div class="temp-low">{{day.temp_min | number:'1.0-0'}}°</div>
+                  </div>
+                  <div class="forecast-precipitation" *ngIf="day.precipitation_prob > 0">
+                    <mat-icon>water_drop</mat-icon>
+                    <span>{{(day.precipitation_prob * 100) | number:'1.0-0'}}%</span>
+                  </div>
+                </mat-card-content>
+              </mat-card>
+            </div>
+          </div>
+          
+          <div class="no-forecast" *ngIf="dailyForecasts.length === 0">
+            <mat-card>
+              <mat-card-content>
+                <div class="no-data-content">
+                  <mat-icon>calendar_today</mat-icon>
+                  <p>5-day forecast data is not available at the moment.</p>
+                  <button mat-raised-button color="primary" (click)="fetchWeather(selectedCity)">
+                    Try Again
+                  </button>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          </div>
+        </div>
+      </mat-tab>
+
+      <mat-tab label="Weather Maps">
+        <div class="tab-content">
+          <div class="maps-grid">
+            <mat-card class="map-card">
+              <mat-card-header>
+                <mat-card-title>
+                  <mat-icon color="primary">radar</mat-icon>
+                  Precipitation Radar
+                </mat-card-title>
+                <mat-card-subtitle>Real-time precipitation and rain intensity across Tunisia</mat-card-subtitle>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="map-container">
+                  <iframe 
+                    [src]="'https://openweathermap.org/weathermap?basemap=map&cities=true&layer=precipitation&lat=' + selectedCity.lat + '&lon=' + selectedCity.lon + '&zoom=8'"
+                    class="weather-map"
+                    title="Precipitation Radar">
+                  </iframe>
+                </div>
+              </mat-card-content>
+            </mat-card>
+
+            <mat-card class="map-card">
+              <mat-card-header>
+                <mat-card-title>
+                  <mat-icon>cloud</mat-icon>
+                  Cloud Cover
+                </mat-card-title>
+                <mat-card-subtitle>Current cloud coverage and patterns</mat-card-subtitle>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="map-container">
+                  <iframe 
+                    [src]="'https://openweathermap.org/weathermap?basemap=map&cities=true&layer=clouds&lat=' + selectedCity.lat + '&lon=' + selectedCity.lon + '&zoom=8'"
+                    class="weather-map"
+                    title="Cloud Cover">
+                  </iframe>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          </div>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </mat-card>
+
+  <!-- Last Updated -->
+  <div class="last-updated" *ngIf="weatherData">
+    Last updated: {{weatherData.dt * 1000 | date:'medium'}}
+  </div>
+</div>

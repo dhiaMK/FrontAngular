@@ -1,0 +1,30 @@
+<div class="map-wrapper">
+  <div #mapContainer class="map-container"></div>
+  
+  <!-- Custom legend -->
+  <div class="map-legend">
+    <div class="legend-item">
+      <div class="legend-marker city-marker"></div>
+      <span>Major Cities</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-marker pin-marker"></div>
+      <span>Pinned Places</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-marker selected-marker"></div>
+      <span>Selected</span>
+    </div>
+  </div>
+
+  <!-- Instructions -->
+  <div class="map-instructions">
+    Click anywhere to pin a location
+  </div>
+
+  <!-- Loading indicator -->
+  <div class="map-loading" *ngIf="!mapLoaded">
+    <mat-spinner diameter="32"></mat-spinner>
+    <p>Loading map...</p>
+  </div>
+</div>
